@@ -22,6 +22,21 @@ function verLocal(id) {
     window.location.href = `./views/local.html?id=${id}`;
 }
 
+function verLocal(id) {
+    let ruta = window.location.href.split('?')[0]; 
+    
+    if (ruta.endsWith('index.html')) {
+        ruta = ruta.replace('index.html', ''); 
+    }
+    
+    if (!ruta.endsWith('/')) {
+        ruta += '/'; 
+    }
+    
+    window.location.href = ruta + 'views/local.html?id=' + id;
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     cargarLocales();
 });
+
