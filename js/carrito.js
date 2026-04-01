@@ -4,9 +4,9 @@ function agregarAlCarrito(idProducto, nombre, precio) {
     const index = carrito.findIndex(item => item.id === idProducto);
     
     if (index !== -1) {
-        carrito[index].cantidad += 1; // Suma cantidad si existe
+        carrito[index].cantidad += 1;
     } else {
-        carrito.push({ id: idProducto, nombre, precio, cantidad: 1 }); // Inserta nuevo
+        carrito.push({ id: idProducto, nombre, precio, cantidad: 1 });
     }
     
     guardarCarrito();
@@ -29,11 +29,6 @@ function guardarCarrito() {
     renderizarCarrito();
     actualizarContador(); 
 }
-
-document.addEventListener('DOMContentLoaded', () => {
-    renderizarCarrito();
-    actualizarContador(); 
-});
 
 function renderizarCarrito() {
     const contenedor = document.getElementById('vista-carrito-offcanvas');
@@ -70,5 +65,7 @@ function renderizarCarrito() {
     }
 }
 
-
-document.addEventListener('DOMContentLoaded', renderizarCarrito);
+document.addEventListener('DOMContentLoaded', () => {
+    renderizarCarrito();
+    actualizarContador(); 
+});

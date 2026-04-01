@@ -11,8 +11,8 @@ document.body.insertAdjacentHTML('afterbegin', `
                 <button class="btn btn-outline-success" type="submit">Buscar</button>
             </form>
             
-            <button class="btn btn-outline-dark position-relative" data-bs-toggle="offcanvas" data-bs-target="#offcanvasCarrito">
-                <i class="fa-solid fa-cart-shopping"></i>
+            <button class="btn btn-light position-relative" id="btn-abrir-carrito">
+                <i class="fa-solid fa-cart-shopping">🛒</i>
                 <span id="contador-carrito" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">0</span>
             </button>
         </div>
@@ -35,3 +35,12 @@ document.body.insertAdjacentHTML('beforeend', `
     </div>
 </div>
 `);
+
+const btnCarrito = document.getElementById('btn-abrir-carrito');
+const menuCarrito = document.getElementById('offcanvasCarrito');
+const offcanvasInstance = new bootstrap.Offcanvas(menuCarrito);
+
+btnCarrito.addEventListener('click', (e) => {
+    e.preventDefault();
+    offcanvasInstance.toggle();
+});
