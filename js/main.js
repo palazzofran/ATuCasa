@@ -19,7 +19,7 @@ function cargarLocales() {
 }
 
 function verLocal(id) {
-    window.location.href = `../views/local.html?id=${id}`;
+    window.location.href = `./views/local.html?id=${id}`;
 }
 
 document.addEventListener('DOMContentLoaded', () => {
