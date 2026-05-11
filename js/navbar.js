@@ -1,18 +1,32 @@
+// =============================================
+// navbar.js — Barra de navegación con carrito
+// =============================================
+
 const rutaBase = window.location.pathname.includes('/views/') ? '../' : './';
+
+const usuario = getUsuarioActual ? getUsuarioActual() : null;
+
+const botonesUsuario = usuario
+    ? `<span class="navbar-text me-3 small text-muted">Hola, <strong>${usuario.nombre.split(' ')[0]}</strong></span>
+       <button class="btn btn-outline-secondary btn-sm me-2" onclick="logout()">Salir</button>`
+    : `<a href="${rutaBase}views/login.html" class="btn btn-outline-primary btn-sm me-2">Ingresar</a>
+       <a href="${rutaBase}views/registro.html" class="btn btn-primary btn-sm me-2">Registrarse</a>`;
 
 document.body.insertAdjacentHTML('afterbegin', `
 <nav class="navbar navbar-expand-lg bg-body-tertiary shadow-sm mb-4">
     <div class="container-fluid">
-        <a class="navbar-brand" href="${rutaBase}index.html">ATuCasa</a>
-        
+        <a class="navbar-brand fw-bold" href="${rutaBase}index.html">🏠 ATuCasa</a>
+
         <div class="d-flex ms-auto align-items-center">
             <form class="d-flex me-3" role="search">
-                <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search"/>
+                <input class="form-control me-2" type="search" placeholder="Buscar locales..." aria-label="Search"/>
                 <button class="btn btn-outline-success" type="submit">Buscar</button>
             </form>
-            
+
+            ${botonesUsuario}
+
             <button class="btn btn-light position-relative" id="btn-abrir-carrito">
-                <i class="fa-solid fa-cart-shopping">🛒</i>
+                🛒
                 <span id="contador-carrito" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">0</span>
             </button>
         </div>
@@ -30,7 +44,7 @@ document.body.insertAdjacentHTML('beforeend', `
         <div id="vista-carrito-offcanvas" class="flex-grow-1 overflow-auto"></div>
         <div class="border-top pt-3 mt-3">
             <h5 class="text-end mb-3">Total: $<span id="total-carrito-offcanvas">0</span></h5>
-            <button class="btn btn-success w-100">Confirmar Pedido</button>
+            <button class="btn btn-success w-100" onclick="irAlCheckout()">Confirmar Pedido</button>
         </div>
     </div>
 </div>
@@ -44,3 +58,8 @@ btnCarrito.addEventListener('click', (e) => {
     e.preventDefault();
     offcanvasInstance.toggle();
 });
+
+function irAlCheckout() {
+    offcanvasInstance.hide();
+    window.location.href = `${rutaBase}views/checkout.html`;
+}
