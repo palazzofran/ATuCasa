@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ATuCasa</title>
+  <!-- CDNs -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+
+<nav class="navbar">
+  <div class="nav-inner">
+    <div class="logo">
+      <div class="logo-icon"><i class="fa-solid fa-house"></i></div>
+      A<span>Tu</span>Casa
+    </div>
+    <div class="search-bar">
+      <i class="fa-solid fa-magnifying-glass"></i>
+      <input type="text" placeholder="Buscar locales, comidas...">
+    </div>
+    <div class="nav-actions">
+      <button class="btn-ghost">Ingresá</button>
+      <button class="btn-primary">Registrarse</button>
+    </div>
+  </div>
+</nav>
+
+<main class="wrap">
+  <section class="hero">
+    <div class="hero-label">Disponible en tu zona</div>
+    <h1>Pedí lo que quieras, <em>ahora.</em></h1>
+    <p>Restaurantes, supermercados y farmacias. Todo en minutos.</p>
+  </section>
+
+  <div class="filters">
+    <div class="filter-chip active">Todos</div>
+    <div class="filter-chip">Comida</div>
+    <div class="filter-chip">Mercado</div>
+    <div class="filter-chip">Farmacia</div>
+  </div>
+
+  <div class="section-header">
+    <span class="section-title">Populares cerca tuyo</span>
+    <a href="#" class="section-link">Ver todos →</a>
+  </div>
+
+  <!-- En Flask esto sería un loop: {% for local in locales %} -->
+  <div class="grid">
+    <div class="card">
+      <div class="card-img">
+        <img src="..." alt="Nombre del local">
+        <div class="card-badge open"><div class="dot"></div>Abierto</div>
+        <div class="card-fav"><i class="fa-regular fa-heart"></i></div>
+      </div>
+      <div class="card-body">
+        <div class="card-top">
+          <div class="card-name">Nombre del Local</div>
+          <div class="card-rating"><i class="fa-solid fa-star"></i> 4.8</div>
+        </div>
+        <div class="card-meta">
+          <span><i class="fa-regular fa-clock"></i> 25–35 min</span>
+          <span><i class="fa-solid fa-motorcycle"></i> Gratis</span>
+        </div>
+        <div class="card-footer">
+          <div class="card-category">Parrilla Argentina</div>
+          <button class="btn-order">+ Pedir</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<!-- Carrito flotante -->
+<div class="cart-pill">
+  <div class="cart-count">2</div>
+  <span class="cart-txt">Ver mi pedido</span>
+  <span class="cart-price">$2.850</span>
+  <i class="fa-solid fa-chevron-right"></i>
+</div>
+
+<script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>

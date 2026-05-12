@@ -1,0 +1,110 @@
+/* ── DESIGN TOKENS ── */
+:root {
+  --bg-deep:       #0a0f0d;
+  --bg-surface:    #111a15;
+  --bg-card:       #141f18;
+  --bg-card-hover: #192518;
+  --emerald:       #10b981;
+  --emerald-glow:  rgba(16,185,129,0.12);
+  --emerald-border:rgba(16,185,129,0.25);
+  --text-primary:  #e8f0eb;
+  --text-secondary:#7a9485;
+  --text-muted:    #3d5045;
+  --border:        #1e2e24;
+  --border-hover:  #2a4033;
+  --radius-lg:     16px;
+  --radius-xl:     24px;
+  --radius-pill:   100px;
+  --font-display:  'Syne', sans-serif;
+  --font-body:     'DM Sans', sans-serif;
+}
+
+/* ── RESET ── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: var(--font-body); background: var(--bg-deep); color: var(--text-primary); min-height: 100vh; overflow-x: hidden; }
+
+/* ── FONDO: grid + glow esmeralda ── */
+body::before {
+  content: '';
+  position: fixed; inset: 0;
+  background-image:
+    linear-gradient(rgba(16,185,129,.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(16,185,129,.03) 1px, transparent 1px);
+  background-size: 48px 48px;
+  pointer-events: none;
+}
+
+/* ── NAVBAR (glassmorphism) ── */
+.navbar {
+  position: sticky; top: 0; z-index: 100;
+  backdrop-filter: blur(20px);
+  background: rgba(10,15,13,0.75);
+  border-bottom: 1px solid var(--border);
+}
+.nav-inner {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 16px 24px; max-width: 1100px; margin: 0 auto;
+}
+.logo { font-family: var(--font-display); font-size: 22px; font-weight: 700; display: flex; align-items: center; gap: 10px; }
+.logo span { color: var(--emerald); }
+.logo-icon { width: 32px; height: 32px; background: var(--emerald); border-radius: 10px; display: flex; align-items: center; justify-content: center; color: #0a0f0d; font-size: 14px; }
+
+.search-bar { display: flex; align-items: center; gap: 10px; background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-pill); padding: 8px 16px; flex: 1; max-width: 340px; transition: border-color .2s; }
+.search-bar:focus-within { border-color: var(--emerald-border); }
+.search-bar input { background: none; border: none; outline: none; color: var(--text-primary); font-family: var(--font-body); font-size: 14px; width: 100%; }
+.search-bar input::placeholder { color: var(--text-muted); }
+
+.btn-ghost { background: none; border: 1px solid var(--border); color: var(--text-secondary); border-radius: var(--radius-pill); padding: 8px 16px; font-size: 13px; cursor: pointer; font-family: var(--font-body); transition: all .2s; }
+.btn-ghost:hover { border-color: var(--border-hover); color: var(--text-primary); }
+.btn-primary { background: var(--emerald); color: #0a0f0d; border: none; border-radius: var(--radius-pill); padding: 8px 18px; font-size: 13px; font-weight: 500; cursor: pointer; font-family: var(--font-body); transition: all .2s; }
+.btn-primary:hover { background: #0d9268; transform: translateY(-1px); }
+
+/* ── HERO ── */
+.wrap { position: relative; z-index: 1; max-width: 1100px; margin: 0 auto; padding: 0 24px; }
+.hero { padding: 72px 0 48px; text-align: center; }
+.hero-label { display: inline-flex; align-items: center; gap: 6px; background: var(--emerald-glow); border: 1px solid var(--emerald-border); border-radius: var(--radius-pill); padding: 5px 14px; font-size: 12px; font-weight: 500; color: var(--emerald); margin-bottom: 24px; text-transform: uppercase; letter-spacing: .08em; }
+.hero h1 { font-family: var(--font-display); font-size: clamp(42px, 6vw, 72px); font-weight: 700; line-height: 1.05; letter-spacing: -2px; margin-bottom: 20px; }
+.hero h1 em { font-style: normal; color: var(--emerald); }
+.hero p { font-size: 17px; color: var(--text-secondary); font-weight: 300; max-width: 480px; margin: 0 auto; line-height: 1.6; }
+
+/* ── FILTERS ── */
+.filters { display: flex; gap: 8px; padding: 24px 0 8px; overflow-x: auto; scrollbar-width: none; }
+.filter-chip { display: flex; align-items: center; gap: 6px; background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-pill); padding: 7px 16px; font-size: 13px; color: var(--text-secondary); white-space: nowrap; cursor: pointer; transition: all .2s; }
+.filter-chip:hover, .filter-chip.active { background: var(--emerald-glow); border-color: var(--emerald-border); color: var(--emerald); }
+
+/* ── CARDS ── */
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px; padding-bottom: 48px; }
+.card { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-xl); overflow: hidden; cursor: pointer; transition: all .25s; animation: fadeUp .5s ease both; }
+.card:hover { border-color: var(--border-hover); background: var(--bg-card-hover); transform: translateY(-3px); }
+
+@keyframes fadeUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+
+.card-img { position: relative; height: 160px; overflow: hidden; }
+.card-img img { width: 100%; height: 100%; object-fit: cover; transition: transform .4s; filter: brightness(.85); }
+.card:hover .card-img img { transform: scale(1.04); filter: brightness(.95); }
+
+.card-badge { position: absolute; top: 12px; left: 12px; background: rgba(10,15,13,0.75); backdrop-filter: blur(8px); border: 1px solid var(--border); border-radius: var(--radius-pill); padding: 4px 10px; font-size: 11px; font-weight: 500; color: var(--text-secondary); display: flex; align-items: center; gap: 5px; }
+.card-badge.open { border-color: var(--emerald-border); color: var(--emerald); }
+.card-badge .dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+
+.card-body { padding: 18px; }
+.card-name { font-family: var(--font-display); font-size: 16px; font-weight: 600; }
+.card-rating { display: flex; align-items: center; gap: 4px; font-size: 13px; color: var(--text-secondary); }
+.card-meta { display: flex; gap: 12px; font-size: 12px; color: var(--text-muted); margin: 8px 0 14px; }
+.card-footer { display: flex; align-items: center; justify-content: space-between; padding-top: 14px; border-top: 1px solid var(--border); }
+.card-category { font-size: 12px; color: var(--text-secondary); }
+.btn-order { background: var(--emerald-glow); border: 1px solid var(--emerald-border); color: var(--emerald); border-radius: var(--radius-pill); padding: 6px 14px; font-size: 12px; font-weight: 500; cursor: pointer; font-family: var(--font-body); transition: all .2s; }
+.btn-order:hover { background: var(--emerald); color: #0a0f0d; }
+
+/* ── CARRITO FLOTANTE (glassmorphism) ── */
+.cart-pill { position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%); z-index: 200; background: rgba(17,26,21,0.85); backdrop-filter: blur(24px); border: 1px solid var(--emerald-border); border-radius: var(--radius-pill); padding: 12px 24px; display: flex; align-items: center; gap: 16px; cursor: pointer; transition: transform .2s; }
+.cart-pill:hover { transform: translateX(-50%) translateY(-2px); }
+.cart-count { background: var(--emerald); color: #0a0f0d; border-radius: 50%; width: 22px; height: 22px; font-size: 12px; font-weight: 700; display: flex; align-items: center; justify-content: center; }
+.cart-price { color: var(--emerald); font-weight: 500; }
+
+/* ── RESPONSIVE ── */
+@media (max-width: 768px) {
+  .hero h1 { font-size: 38px; }
+  .nav-inner { flex-wrap: wrap; gap: 12px; }
+  .search-bar { max-width: 100%; order: 3; width: 100%; }
+}
