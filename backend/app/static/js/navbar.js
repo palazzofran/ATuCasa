@@ -1,65 +1,34 @@
-// =============================================
-// navbar.js — Barra de navegación con carrito
-// =============================================
+const _base = window.location.pathname.includes('/views/') ? '../' : './';
+const _usuario = (typeof getUsuarioActual === 'function') ? getUsuarioActual() : null;
 
-const rutaBase = window.location.pathname.includes('/views/') ? '../' : './';
-
-const usuario = getUsuarioActual ? getUsuarioActual() : null;
-
-const botonesUsuario = usuario
-    ? `<span class="navbar-text me-3 small text-muted">Hola, <strong>${usuario.nombre.split(' ')[0]}</strong></span>
-       <button class="btn btn-outline-secondary btn-sm me-2" onclick="logout()">Salir</button>`
-    : `<a href="${rutaBase}views/login.html" class="btn btn-outline-primary btn-sm me-2">Ingresar</a>
-       <a href="${rutaBase}views/registro.html" class="btn btn-primary btn-sm me-2">Registrarse</a>`;
+const _botonesUsuario = _usuario
+    ? `<span style="font-size:13px;color:var(--text-secondary)">Hola, <strong style="color:var(--text-primary)">${_usuario.nombre.split(' ')[0]}</strong></span>
+       <button class="btn-ghost" onclick="logout()"><i class="fa-solid fa-right-from-bracket"></i></button>`
+    : `<a href="${_base}views/login.html" class="btn-ghost">Ingresar</a>
+       <a href="${_base}views/registro.html" class="btn-primary">Registrarse</a>`;
 
 document.body.insertAdjacentHTML('afterbegin', `
-<nav class="navbar navbar-expand-lg bg-body-tertiary shadow-sm mb-4">
-    <div class="container-fluid">
-        <a class="navbar-brand fw-bold" href="${rutaBase}index.html">🏠 ATuCasa</a>
-
-        <div class="d-flex ms-auto align-items-center">
-            <form class="d-flex me-3" role="search">
-                <input class="form-control me-2" type="search" placeholder="Buscar locales..." aria-label="Search"/>
-                <button class="btn btn-outline-success" type="submit">Buscar</button>
-            </form>
-
-            ${botonesUsuario}
-
-            <button class="btn btn-light position-relative" id="btn-abrir-carrito">
-                🛒
-                <span id="contador-carrito" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">0</span>
-            </button>
-        </div>
+<nav class="navbar">
+  <div class="nav-inner">
+    <a href="${_base}index.html" class="logo">
+      <div class="logo-icon"><i class="fa-solid fa-house"></i></div>
+      A<em>Tu</em>Casa
+    </a>
+    <div class="search-bar">
+      <i class="fa-solid fa-magnifying-glass"></i>
+      <input type="text" id="search-input" placeholder="Buscar locales, comidas...">
     </div>
+    <div class="nav-actions">
+      ${_botonesUsuario}
+      <button class="btn-ghost" id="btn-carrito" style="position:relative;padding:7px 14px">
+        <i class="fa-solid fa-bag-shopping"></i>
+        <span id="contador-carrito" style="position:absolute;top:-4px;right:-4px;width:18px;height:18px;background:var(--emerald);color:#0a0f0d;border-radius:50%;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;display:none">0</span>
+      </button>
+    </div>
+  </div>
 </nav>
 `);
 
-document.body.insertAdjacentHTML('beforeend', `
-<div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasCarrito" aria-labelledby="offcanvasCarritoLabel">
-    <div class="offcanvas-header border-bottom">
-        <h5 class="offcanvas-title" id="offcanvasCarritoLabel">Tu Pedido</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
-    </div>
-    <div class="offcanvas-body d-flex flex-column">
-        <div id="vista-carrito-offcanvas" class="flex-grow-1 overflow-auto"></div>
-        <div class="border-top pt-3 mt-3">
-            <h5 class="text-end mb-3">Total: $<span id="total-carrito-offcanvas">0</span></h5>
-            <button class="btn btn-success w-100" onclick="irAlCheckout()">Confirmar Pedido</button>
-        </div>
-    </div>
-</div>
-`);
-
-const btnCarrito = document.getElementById('btn-abrir-carrito');
-const menuCarrito = document.getElementById('offcanvasCarrito');
-const offcanvasInstance = new bootstrap.Offcanvas(menuCarrito);
-
-btnCarrito.addEventListener('click', (e) => {
-    e.preventDefault();
-    offcanvasInstance.toggle();
+document.getElementById('btn-carrito')?.addEventListener('click', () => {
+    window.location.href = `${_base}views/checkout.html`;
 });
-
-function irAlCheckout() {
-    offcanvasInstance.hide();
-    window.location.href = `${rutaBase}views/checkout.html`;
-}

@@ -3,85 +3,157 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ATuCasa</title>
-  <!-- CDNs -->
+  <title>ATuCasa — Pedí lo que quieras</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <link rel="stylesheet" href="./static/css/style.css">
 </head>
 <body>
 
-<nav class="navbar">
-  <div class="nav-inner">
-    <div class="logo">
-      <div class="logo-icon"><i class="fa-solid fa-house"></i></div>
-      A<span>Tu</span>Casa
-    </div>
-    <div class="search-bar">
-      <i class="fa-solid fa-magnifying-glass"></i>
-      <input type="text" placeholder="Buscar locales, comidas...">
-    </div>
-    <div class="nav-actions">
-      <button class="btn-ghost">Ingresá</button>
-      <button class="btn-primary">Registrarse</button>
-    </div>
-  </div>
-</nav>
+<script src="./static/js/api.js"></script>
+<script src="./static/js/auth.js"></script>
+<script src="./static/js/carrito.js"></script>
+<script src="./static/js/navbar.js"></script>
 
-<main class="wrap">
+<div class="wrap">
+
   <section class="hero">
-    <div class="hero-label">Disponible en tu zona</div>
-    <h1>Pedí lo que quieras, <em>ahora.</em></h1>
-    <p>Restaurantes, supermercados y farmacias. Todo en minutos.</p>
+    <div class="hero-label"><div class="pulse"></div> Disponible en tu zona</div>
+    <h1>Pedí lo que<br>quieras, <em>ahora.</em></h1>
+    <p>Restaurantes, supermercados y farmacias. Todo en un solo lugar, en minutos.</p>
+    <div class="hero-stats">
+      <div class="stat"><div class="stat-n" id="stat-locales">—</div><div class="stat-l">Locales activos</div></div>
+      <div class="stat-sep"></div>
+      <div class="stat"><div class="stat-n">~30m</div><div class="stat-l">Entrega promedio</div></div>
+      <div class="stat-sep"></div>
+      <div class="stat"><div class="stat-n">4.8 <i class="fa-solid fa-star" style="color:#f59e0b;font-size:18px"></i></div><div class="stat-l">Calificación</div></div>
+    </div>
   </section>
 
-  <div class="filters">
-    <div class="filter-chip active">Todos</div>
-    <div class="filter-chip">Comida</div>
-    <div class="filter-chip">Mercado</div>
-    <div class="filter-chip">Farmacia</div>
+  <div class="filters" id="filtros">
+    <div class="filter-chip active" data-cat=""><i class="fa-solid fa-border-all"></i> Todos</div>
+    <div class="filter-chip" data-cat="comida"><i class="fa-solid fa-utensils"></i> Comida</div>
+    <div class="filter-chip" data-cat="hamburguesas"><i class="fa-solid fa-burger"></i> Hamburguesas</div>
+    <div class="filter-chip" data-cat="pizza"><i class="fa-solid fa-pizza-slice"></i> Pizza</div>
+    <div class="filter-chip" data-cat="sushi"><i class="fa-solid fa-fish"></i> Sushi</div>
+    <div class="filter-chip" data-cat="mercado"><i class="fa-solid fa-basket-shopping"></i> Mercado</div>
+    <div class="filter-chip" data-cat="farmacia"><i class="fa-solid fa-pills"></i> Farmacia</div>
+    <div class="filter-chip" data-cat="postres"><i class="fa-solid fa-ice-cream"></i> Postres</div>
   </div>
 
   <div class="section-header">
     <span class="section-title">Populares cerca tuyo</span>
-    <a href="#" class="section-link">Ver todos →</a>
+    <a href="#" class="section-link">Ver todos <i class="fa-solid fa-arrow-right"></i></a>
   </div>
 
-  <!-- En Flask esto sería un loop: {% for local in locales %} -->
-  <div class="grid">
-    <div class="card">
-      <div class="card-img">
-        <img src="..." alt="Nombre del local">
-        <div class="card-badge open"><div class="dot"></div>Abierto</div>
-        <div class="card-fav"><i class="fa-regular fa-heart"></i></div>
-      </div>
-      <div class="card-body">
-        <div class="card-top">
-          <div class="card-name">Nombre del Local</div>
-          <div class="card-rating"><i class="fa-solid fa-star"></i> 4.8</div>
-        </div>
-        <div class="card-meta">
-          <span><i class="fa-regular fa-clock"></i> 25–35 min</span>
-          <span><i class="fa-solid fa-motorcycle"></i> Gratis</span>
-        </div>
-        <div class="card-footer">
-          <div class="card-category">Parrilla Argentina</div>
-          <button class="btn-order">+ Pedir</button>
-        </div>
-      </div>
+  <div class="grid" id="grid-locales">
+    <div style="grid-column:1/-1;text-align:center;padding:60px 0">
+      <div class="spinner"></div>
     </div>
   </div>
-</main>
-
-<!-- Carrito flotante -->
-<div class="cart-pill">
-  <div class="cart-count">2</div>
-  <span class="cart-txt">Ver mi pedido</span>
-  <span class="cart-price">$2.850</span>
-  <i class="fa-solid fa-chevron-right"></i>
 </div>
 
-<script src="{{ url_for('static', filename='js/main.js') }}"></script>
+<!-- Carrito flotante -->
+<a href="./views/checkout.html" class="cart-pill hidden" id="cart-pill">
+  <div class="cart-count">0</div>
+  <span class="cart-txt">Ver mi pedido</span>
+  <span class="cart-price">$0</span>
+  <i class="fa-solid fa-chevron-right cart-arrow"></i>
+</a>
+
+<script>
+let todosLosLocales = [];
+
+async function cargarLocales(categoria = '') {
+  const grid = document.getElementById('grid-locales');
+  grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:60px 0"><div class="spinner"></div></div>';
+
+  try {
+    const url = categoria ? `/locales?categoria=${categoria}` : '/locales';
+    todosLosLocales = await api.get(url);
+
+    document.getElementById('stat-locales').textContent = todosLosLocales.length + '+';
+
+    if (todosLosLocales.length === 0) {
+      grid.innerHTML = `
+        <div class="empty-state" style="grid-column:1/-1">
+          <i class="fa-solid fa-store-slash"></i>
+          <h3>No hay locales disponibles</h3>
+          <p>Intentá con otra categoría</p>
+        </div>`;
+      return;
+    }
+
+    grid.innerHTML = '';
+    todosLosLocales.forEach(renderCard);
+  } catch (e) {
+    grid.innerHTML = `
+      <div class="empty-state" style="grid-column:1/-1">
+        <i class="fa-solid fa-plug-circle-exclamation"></i>
+        <h3>Sin conexión al servidor</h3>
+        <p>Verificá que el backend esté corriendo en <strong>localhost:8000</strong></p>
+        <br><button class="btn-primary" onclick="cargarLocales()" style="margin-top:16px">
+          <i class="fa-solid fa-rotate-right"></i> Reintentar
+        </button>
+      </div>`;
+  }
+}
+
+function renderCard(local) {
+  const grid = document.getElementById('grid-locales');
+  const img = local.imagen_url || `https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=600&q=70`;
+  const envio = local.envio_gratis ? 'Gratis' : `$${(local.costo_envio || 350).toLocaleString('es-AR')}`;
+  const tiempo = local.tiempo_entrega || '25–40';
+  const rating = local.rating || '4.7';
+
+  grid.innerHTML += `
+  <div class="card" onclick="window.location.href='./views/local.html?id=${local.id}'">
+    <div class="card-img">
+      <img src="${img}" alt="${local.nombre}" loading="lazy"
+           onerror="this.src='https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=600&q=70'">
+      <div class="card-badge open"><div class="dot"></div>${local.activo ? 'Abierto' : 'Cerrado'}</div>
+      <div class="card-fav" onclick="event.stopPropagation();this.classList.toggle('active')">
+        <i class="fa-heart ${localStorage.getItem('fav_'+local.id) ? 'fa-solid' : 'fa-regular'}"></i>
+      </div>
+    </div>
+    <div class="card-body">
+      <div class="card-top">
+        <div class="card-name">${local.nombre}</div>
+        <div class="card-rating"><i class="fa-solid fa-star"></i> ${rating}</div>
+      </div>
+      <div class="card-meta">
+        <span><i class="fa-regular fa-clock"></i> ${tiempo} min</span>
+        <span><i class="fa-solid fa-motorcycle"></i> ${envio}</span>
+      </div>
+      <div class="card-footer">
+        <div class="card-category"><div class="cat-dot"></div>${local.categoria || 'General'}</div>
+        <button class="btn-order" onclick="event.stopPropagation();window.location.href='./views/local.html?id=${local.id}'">
+          <i class="fa-solid fa-plus"></i> Pedir
+        </button>
+      </div>
+    </div>
+  </div>`;
+}
+
+document.querySelectorAll('.filter-chip').forEach(chip => {
+  chip.addEventListener('click', () => {
+    document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+    chip.classList.add('active');
+    cargarLocales(chip.dataset.cat);
+  });
+});
+
+document.getElementById('search-input')?.addEventListener('input', (e) => {
+  const q = e.target.value.toLowerCase();
+  document.querySelectorAll('.card').forEach(card => {
+    const nombre = card.querySelector('.card-name')?.textContent.toLowerCase() || '';
+    card.style.display = nombre.includes(q) ? '' : 'none';
+  });
+});
+
+cargarLocales();
+</script>
+
 </body>
 </html>
