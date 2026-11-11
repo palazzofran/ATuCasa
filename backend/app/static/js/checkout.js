@@ -10,7 +10,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const nombreEl = document.getElementById('nombre-usuario');
 
     // Mostrar resumen del carrito
-    const carrito = JSON.parse(localStorage.getItem('carrito')) || [];
+    const carrito = JSON.parse(localStorage.getItem('atc_carrito')) || [];
 
     if (carrito.length === 0) {
         resumen.innerHTML = '<p class="text-muted">No hay productos en el carrito.</p>';
@@ -41,7 +41,7 @@ document.addEventListener('DOMContentLoaded', () => {
         btnConfirmar.addEventListener('click', async () => {
             const direccion = document.getElementById('input-direccion').value.trim();
             const mensajeDiv = document.getElementById('mensaje-pedido');
-            const localId = parseInt(localStorage.getItem('local_id_actual'));
+            const localId = parseInt(localStorage.getItem('atc_local_id'));
 
             if (!direccion) {
                 mensajeDiv.innerHTML = '<div class="alert alert-warning">Por favor ingresá una dirección de entrega.</div>';

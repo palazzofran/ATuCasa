@@ -35,6 +35,16 @@ function limpiarCarrito() {
     _actualizarContador();
 }
 
+// El carrito pertenece a un solo local: al entrar a otro local se vacía.
+function setLocalCarrito(idLocal) {
+    const anterior = parseInt(localStorage.getItem('atc_local_id'));
+    if (anterior && anterior !== idLocal && carrito.length > 0) {
+        limpiarCarrito();
+        _mostrarToast('Se vació el pedido anterior: era de otro local');
+    }
+    localStorage.setItem('atc_local_id', idLocal);
+}
+
 function getTotalCarrito() {
     return carrito.reduce((acc, i) => acc + i.precio * i.cantidad, 0);
 }
@@ -73,10 +83,10 @@ function _mostrarToast(msg) {
     t.textContent = msg;
     Object.assign(t.style, {
         position:'fixed', bottom:'80px', left:'50%', transform:'translateX(-50%)',
-        background:'var(--bg-card)', border:'1px solid var(--emerald-border)',
-        color:'var(--emerald)', padding:'10px 20px', borderRadius:'var(--radius-pill)',
+        background:'var(--bg-card)', border:'1px solid var(--brand-border)',
+        color:'var(--brand)', padding:'10px 20px', borderRadius:'var(--radius-pill)',
         fontSize:'13px', fontWeight:'500', zIndex:'300', whiteSpace:'nowrap',
-        animation:'fadeUp .25s ease', boxShadow:'0 4px 20px rgba(0,0,0,.3)'
+        animation:'fadeUp .25s ease', boxShadow:'var(--shadow-md)'
     });
     document.body.appendChild(t);
     setTimeout(() => t.remove(), 2000);

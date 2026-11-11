@@ -12,7 +12,7 @@ document.body.insertAdjacentHTML('afterbegin', `
   <div class="nav-inner">
     <a href="${_base}index.html" class="logo">
       <div class="logo-icon"><i class="fa-solid fa-house"></i></div>
-      A<em>Tu</em>Casa
+      <span>A<em>Tu</em>Casa</span>
     </a>
     <div class="search-bar">
       <i class="fa-solid fa-magnifying-glass"></i>
@@ -22,7 +22,7 @@ document.body.insertAdjacentHTML('afterbegin', `
       ${_botonesUsuario}
       <button class="btn-ghost" id="btn-carrito" style="position:relative;padding:7px 14px">
         <i class="fa-solid fa-bag-shopping"></i>
-        <span id="contador-carrito" style="position:absolute;top:-4px;right:-4px;width:18px;height:18px;background:var(--emerald);color:#0a0f0d;border-radius:50%;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;display:none">0</span>
+        <span id="contador-carrito" style="position:absolute;top:-4px;right:-4px;width:18px;height:18px;background:var(--brand);color:#fff;border-radius:50%;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;display:none">0</span>
       </button>
     </div>
   </div>

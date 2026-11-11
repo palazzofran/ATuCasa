@@ -1,10 +1,11 @@
 fastapi==0.111.0
 uvicorn[standard]==0.29.0
-sqlalchemy==2.0.30
+sqlalchemy==2.0.57
 alembic==1.13.1
 pydantic[email]==2.10.6
 pydantic-settings==2.7.1
 python-jose[cryptography]==3.3.0
 passlib[bcrypt]==1.7.4
+bcrypt==4.0.1  # passlib 1.7.4 falla con bcrypt>=4.1 (error 500 en registro/login)
 python-multipart==0.0.9
 python-dotenv==1.0.1

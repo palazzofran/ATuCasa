@@ -56,7 +56,7 @@ async function cargarLocal() {
         });
 
         // Guardar el local_id para usarlo al crear el pedido
-        localStorage.setItem('local_id_actual', idLocal);
+        localStorage.setItem('atc_local_id', idLocal);
 
     } catch (error) {
         document.getElementById('info-local').innerHTML = `
