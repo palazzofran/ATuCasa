@@ -1,3 +1,4 @@
+import unicodedata
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from typing import List
@@ -10,13 +11,38 @@ from ..schemas.local import LocalCreate, LocalUpdate, LocalResponse, LocalConPro
 router = APIRouter(prefix="/locales", tags=["Locales"])
 
 
+def _normalizar(texto: str | None) -> str:
+    """Minúsculas y sin tildes, para que 'pizzeria' encuentre 'Pizzería'."""
+    if not texto:
+        return ""
+    sin_tildes = unicodedata.normalize("NFKD", texto)
+    return "".join(c for c in sin_tildes if not unicodedata.combining(c)).casefold()
+
+
+def _coincide(local: Local, palabras: List[str]) -> bool:
+    """True si cada palabra aparece en el local (nombre, categoría, descripción)
+    o en alguno de sus productos disponibles."""
+    textos = [local.nombre, local.categoria, local.descripcion]
+    for p in local.productos:
+        if p.disponible:
+            textos += [p.nombre, p.descripcion]
+    pajar = " ".join(_normalizar(t) for t in textos)
+    return all(palabra in pajar for palabra in palabras)
+
+
 @router.get("/", response_model=List[LocalResponse])
-def listar_locales(categoria: str = None, db: Session = Depends(get_db)):
-    """Lista todos los locales activos. Se puede filtrar por categoría."""
+def listar_locales(categoria: str = None, q: str = None, db: Session = Depends(get_db)):
+    """Lista todos los locales activos. Se puede filtrar por categoría y buscar con `q`
+    (busca en el local y en sus productos, sin distinguir mayúsculas ni tildes)."""
     query = db.query(Local).filter(Local.activo == True)
     if categoria:
         query = query.filter(Local.categoria == categoria)
-    return query.all()
+    locales = query.all()
+
+    palabras = _normalizar(q).split()
+    if palabras:
+        locales = [l for l in locales if _coincide(l, palabras)]
+    return locales
 
 
 @router.get("/{local_id}", response_model=LocalConProductos)

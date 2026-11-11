@@ -23,13 +23,15 @@ The project has no tests, linter or formatter configured. Alembic is in `require
 
 ## Architecture
 
-**Backend (`backend/app/`)** is organized in layers: `models/` (SQLAlchemy ORM), `schemas/` (Pydantic v2 request/response models with `from_attributes`), `routers/` (one per resource: `auth`, `locales`, `pedidos`), and `core/` (settings, DB session and security).
+**Backend (`backend/app/`)** is organized in layers: `models/` (SQLAlchemy ORM), `schemas/` (Pydantic v2 request/response models with `from_attributes`), `routers/` (one per resource: `auth`, `locales`, `pedidos`, `favoritos`), and `core/` (settings, DB session and security).
 
 - **Schema creation:** `main.py` runs `Base.metadata.create_all()` on import. Changing a model doesn't alter existing tables, so in development delete the SQLite file or alter the table by hand.
 - **Auth:** JWT bearer tokens with `sub` set to the user id (as a string) and a `rol` claim. Routers get the user through the `get_current_user` dependency. Merchant-only endpoints use `require_comercio`, which returns 403 unless `rol == "comercio"`. Ownership checks (`local.propietario_id == current_user.id`) are written inline in each handler, not in a shared dependency.
 - **Roles:** `cliente` or `comercio`, stored as a DB enum on `Usuario`.
 - **Relationships set with `backref`:** `Usuario.locales` and `Usuario.pedidos` are created by `backref` in `local.py` and `pedido.py` rather than declared on `Usuario`.
 - **Orders:** `POST /pedidos` computes the total on the server from current product prices and stores `precio_unitario` on each `ItemPedido`. Every product must belong to `local_id` and be `disponible`. Status flow: `pendiente → en_preparacion → enviado → entregado`. Customers may only set `cancelado`; the store owner may set any status. Transitions aren't enforced.
+- **Search:** `GET /locales?q=` filters in Python (not SQL) so it can ignore case and accents (`_normalizar` in `routers/locales.py`); every word must appear in the store's name/category/description or in one of its available products.
+- **Favorites:** `Favorito` table (unique per user+store); `GET /favoritos`, idempotent `PUT`/`DELETE /favoritos/{local_id}` returning 204. `api.js` handles empty 204 bodies.
 - **Soft visibility:** public listings filter on `Local.activo` and `Producto.disponible`. Products are hard-deleted.
 - **CORS:** all origins are allowed.
 

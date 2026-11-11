@@ -8,14 +8,14 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-  <link rel="stylesheet" href="./static/css/style.css?v=4">
+  <link rel="stylesheet" href="./static/css/style.css?v=5">
 </head>
 <body>
 
-<script src="./static/js/api.js?v=4"></script>
-<script src="./static/js/auth.js?v=4"></script>
-<script src="./static/js/carrito.js?v=4"></script>
-<script src="./static/js/navbar.js?v=4"></script>
+<script src="./static/js/api.js?v=5"></script>
+<script src="./static/js/auth.js?v=5"></script>
+<script src="./static/js/carrito.js?v=5"></script>
+<script src="./static/js/navbar.js?v=5"></script>
 
 <div class="wrap">
 
@@ -64,31 +64,76 @@
 </a>
 
 <script>
-let todosLosLocales = [];
+let favoritos = new Set();        // ids de los locales favoritos del usuario
+let filtroCategoria = '';         // '' = todos, '__fav' = solo favoritos
+let busqueda = new URLSearchParams(location.search).get('q') || '';
+let _pedidoActual = 0;            // para descartar respuestas viejas si se escribe rápido
 
-async function cargarLocales(categoria = '') {
+// Avisa a navbar.js que la búsqueda se resuelve acá, sin cambiar de página
+window.ATC_BUSQUEDA_EN_PAGINA = true;
+
+function esc(t) {
+  return String(t ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+}
+
+async function cargarFavoritos() {
+  if (!estaLogueado()) return;
+  try {
+    const locales = await api.get('/favoritos');
+    favoritos = new Set(locales.map(l => l.id));
+  } catch (e) {
+    favoritos = new Set();
+  }
+}
+
+function _estadoVacio(icono, titulo, texto) {
+  return `
+    <div class="empty-state" style="grid-column:1/-1">
+      <i class="fa-solid ${icono}"></i>
+      <h3>${titulo}</h3>
+      <p>${texto}</p>
+    </div>`;
+}
+
+function _actualizarTitulo() {
+  const titulo = document.querySelector('.section-title');
+  if (busqueda) titulo.textContent = `Resultados para "${busqueda}"`;
+  else if (filtroCategoria === '__fav') titulo.textContent = 'Tus favoritos';
+  else titulo.textContent = 'Populares cerca tuyo';
+}
+
+async function cargarLocales() {
   const grid = document.getElementById('grid-locales');
   grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:60px 0"><div class="spinner"></div></div>';
+  _actualizarTitulo();
+  const pedido = ++_pedidoActual;
 
   try {
-    const url = categoria ? `/locales?categoria=${categoria}` : '/locales';
-    todosLosLocales = await api.get(url);
+    const params = new URLSearchParams();
+    if (filtroCategoria && filtroCategoria !== '__fav') params.set('categoria', filtroCategoria);
+    if (busqueda) params.set('q', busqueda);
+    let locales = await api.get('/locales' + (params.toString() ? '?' + params : ''));
+    if (pedido !== _pedidoActual) return;   // llegó una búsqueda más nueva
 
-    document.getElementById('stat-locales').textContent = todosLosLocales.length + '+';
+    if (!filtroCategoria && !busqueda) {
+      document.getElementById('stat-locales').textContent = locales.length + '+';
+    }
+    if (filtroCategoria === '__fav') locales = locales.filter(l => favoritos.has(l.id));
 
-    if (todosLosLocales.length === 0) {
-      grid.innerHTML = `
-        <div class="empty-state" style="grid-column:1/-1">
-          <i class="fa-solid fa-store-slash"></i>
-          <h3>No hay locales disponibles</h3>
-          <p>Intentá con otra categoría</p>
-        </div>`;
+    if (locales.length === 0) {
+      if (filtroCategoria === '__fav' && !busqueda) {
+        grid.innerHTML = _estadoVacio('fa-heart', 'Todavía no tenés favoritos', 'Tocá el corazón de un local para guardarlo acá.');
+      } else if (busqueda) {
+        grid.innerHTML = _estadoVacio('fa-magnifying-glass', `No encontramos nada para "${esc(busqueda)}"`, 'Probá con otra palabra o con otra categoría.');
+      } else {
+        grid.innerHTML = _estadoVacio('fa-store-slash', 'No hay locales disponibles', 'Intentá con otra categoría.');
+      }
       return;
     }
 
-    grid.innerHTML = '';
-    todosLosLocales.forEach(renderCard);
+    grid.innerHTML = locales.map(renderCard).join('');
   } catch (e) {
+    if (pedido !== _pedidoActual) return;
     grid.innerHTML = `
       <div class="empty-state" style="grid-column:1/-1">
         <i class="fa-solid fa-plug-circle-exclamation"></i>
@@ -102,25 +147,27 @@ async function cargarLocales(categoria = '') {
 }
 
 function renderCard(local) {
-  const grid = document.getElementById('grid-locales');
   const img = local.imagen_url || `https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=600&q=70`;
   const envio = local.envio_gratis ? 'Gratis' : `$${(local.costo_envio || 350).toLocaleString('es-AR')}`;
   const tiempo = local.tiempo_entrega || '25–40';
   const rating = local.rating || '4.7';
+  const fav = favoritos.has(local.id);
 
-  grid.innerHTML += `
+  return `
   <div class="card" onclick="window.location.href='./views/local.html?id=${local.id}'">
     <div class="card-img">
-      <img src="${img}" alt="${local.nombre}" loading="lazy"
+      <img src="${esc(img)}" alt="${esc(local.nombre)}" loading="lazy"
            onerror="this.src='https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=600&q=70'">
       <div class="card-badge open"><div class="dot"></div>${local.activo ? 'Abierto' : 'Cerrado'}</div>
-      <div class="card-fav" onclick="event.stopPropagation();this.classList.toggle('active')">
-        <i class="fa-heart ${localStorage.getItem('fav_'+local.id) ? 'fa-solid' : 'fa-regular'}"></i>
-      </div>
+      <button type="button" class="card-fav ${fav ? 'active' : ''}"
+              aria-label="${fav ? 'Quitar de favoritos' : 'Agregar a favoritos'}" aria-pressed="${fav}"
+              onclick="event.stopPropagation();toggleFavorito(${local.id}, this)">
+        <i class="fa-heart ${fav ? 'fa-solid' : 'fa-regular'}"></i>
+      </button>
     </div>
     <div class="card-body">
       <div class="card-top">
-        <div class="card-name">${local.nombre}</div>
+        <div class="card-name">${esc(local.nombre)}</div>
         <div class="card-rating"><i class="fa-solid fa-star"></i> ${rating}</div>
       </div>
       <div class="card-meta">
@@ -128,7 +175,7 @@ function renderCard(local) {
         <span><i class="fa-solid fa-motorcycle"></i> ${envio}</span>
       </div>
       <div class="card-footer">
-        <div class="card-category"><div class="cat-dot"></div>${local.categoria || 'General'}</div>
+        <div class="card-category"><div class="cat-dot"></div>${esc(local.categoria || 'General')}</div>
         <button class="btn-order" onclick="event.stopPropagation();window.location.href='./views/local.html?id=${local.id}'">
           <i class="fa-solid fa-plus"></i> Pedir
         </button>
@@ -137,23 +184,74 @@ function renderCard(local) {
   </div>`;
 }
 
+function _pintarCorazon(btn, fav) {
+  btn.classList.toggle('active', fav);
+  btn.setAttribute('aria-pressed', fav);
+  btn.setAttribute('aria-label', fav ? 'Quitar de favoritos' : 'Agregar a favoritos');
+  btn.querySelector('i').className = `fa-heart ${fav ? 'fa-solid' : 'fa-regular'}`;
+}
+
+async function toggleFavorito(idLocal, btn) {
+  if (!estaLogueado()) {
+    _mostrarToast('Iniciá sesión para guardar favoritos');
+    setTimeout(() => {
+      window.location.href = './views/login.html?next=' + encodeURIComponent('../index.html');
+    }, 1200);
+    return;
+  }
+
+  const eraFavorito = favoritos.has(idLocal);
+  // Se pinta al instante y se revierte si el servidor falla
+  eraFavorito ? favoritos.delete(idLocal) : favoritos.add(idLocal);
+  _pintarCorazon(btn, !eraFavorito);
+  btn.disabled = true;
+
+  try {
+    if (eraFavorito) await api.delete(`/favoritos/${idLocal}`);
+    else await api.put(`/favoritos/${idLocal}`);
+    _mostrarToast(eraFavorito ? 'Quitado de favoritos' : 'Guardado en favoritos');
+    if (eraFavorito && filtroCategoria === '__fav') cargarLocales();
+  } catch (e) {
+    eraFavorito ? favoritos.add(idLocal) : favoritos.delete(idLocal);
+    _pintarCorazon(btn, eraFavorito);
+    _mostrarToast('No se pudo guardar el favorito. Probá de nuevo.');
+  } finally {
+    btn.disabled = false;
+  }
+}
+
+// Filtro "Favoritos": solo para usuarios registrados
+if (estaLogueado()) {
+  document.querySelector('.filter-chip[data-cat=""]').insertAdjacentHTML('afterend',
+    '<div class="filter-chip" data-cat="__fav"><i class="fa-solid fa-heart"></i> Favoritos</div>');
+}
+
 document.querySelectorAll('.filter-chip').forEach(chip => {
   chip.addEventListener('click', () => {
     document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
     chip.classList.add('active');
-    cargarLocales(chip.dataset.cat);
+    filtroCategoria = chip.dataset.cat;
+    cargarLocales();
   });
 });
 
+// Buscador: busca en el servidor (locales y productos) al dejar de escribir
+let _esperaBusqueda;
 document.getElementById('search-input')?.addEventListener('input', (e) => {
-  const q = e.target.value.toLowerCase();
-  document.querySelectorAll('.card').forEach(card => {
-    const nombre = card.querySelector('.card-name')?.textContent.toLowerCase() || '';
-    card.style.display = nombre.includes(q) ? '' : 'none';
-  });
+  clearTimeout(_esperaBusqueda);
+  _esperaBusqueda = setTimeout(() => {
+    busqueda = e.target.value.trim();
+    const url = new URL(location.href);
+    busqueda ? url.searchParams.set('q', busqueda) : url.searchParams.delete('q');
+    history.replaceState(null, '', url);
+    cargarLocales();
+  }, 250);
 });
 
-cargarLocales();
+(async () => {
+  await cargarFavoritos();
+  cargarLocales();
+})();
 </script>
 
 </body>

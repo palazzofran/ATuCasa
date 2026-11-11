@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from .core.database import Base, engine
-from .routers import auth, locales, pedidos
+from .routers import auth, locales, pedidos, favoritos
 
 # Crear todas las tablas en la base de datos
 Base.metadata.create_all(bind=engine)
@@ -25,6 +25,7 @@ app.add_middleware(
 app.include_router(auth.router)
 app.include_router(locales.router)
 app.include_router(pedidos.router)
+app.include_router(favoritos.router)
 
 
 @app.get("/", tags=["Root"])

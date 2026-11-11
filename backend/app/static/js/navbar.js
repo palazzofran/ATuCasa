@@ -30,6 +30,19 @@ document.body.insertAdjacentHTML('afterbegin', `
 </nav>
 `);
 
+// ── Buscador ──
+// En la portada filtra mientras escribís (index.html escucha el evento 'input').
+// En las demás páginas, Enter lleva a la portada con la búsqueda (?q=...).
+const _inputBusqueda = document.getElementById('search-input');
+if (_inputBusqueda) {
+    _inputBusqueda.value = new URLSearchParams(window.location.search).get('q') || '';
+    _inputBusqueda.addEventListener('keydown', (e) => {
+        if (e.key !== 'Enter' || window.ATC_BUSQUEDA_EN_PAGINA) return;
+        const q = _inputBusqueda.value.trim();
+        window.location.href = `${_base}index.html${q ? '?q=' + encodeURIComponent(q) : ''}`;
+    });
+}
+
 document.getElementById('btn-carrito')?.addEventListener('click', () => {
     window.location.href = `${_base}views/checkout.html`;
 });

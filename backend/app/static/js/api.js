@@ -16,8 +16,13 @@ async function apiFetch(endpoint, options = {}) {
         return;
     }
 
-    const data = await response.json();
-    if (!response.ok) throw new Error(data.detail || 'Error en la solicitud');
+    // 204 No Content (por ejemplo, al marcar un favorito) no trae cuerpo
+    const texto = await response.text();
+    const data = texto ? JSON.parse(texto) : null;
+    if (!response.ok) {
+        const detalle = data && data.detail;
+        throw new Error(typeof detalle === 'string' ? detalle : 'Error en la solicitud');
+    }
     return data;
 }
 
