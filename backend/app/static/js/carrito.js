@@ -84,7 +84,7 @@ function _mostrarToast(msg) {
     Object.assign(t.style, {
         position:'fixed', bottom:'80px', left:'50%', transform:'translateX(-50%)',
         background:'var(--bg-card)', border:'1px solid var(--brand-border)',
-        color:'var(--brand)', padding:'10px 20px', borderRadius:'var(--radius-pill)',
+        color:'var(--brand-text)', padding:'10px 20px', borderRadius:'var(--radius-pill)',
         fontSize:'13px', fontWeight:'500', zIndex:'300', whiteSpace:'nowrap',
         animation:'fadeUp .25s ease', boxShadow:'var(--shadow-md)'
     });

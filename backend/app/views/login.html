@@ -2,12 +2,13 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
+  <script>try{var t=localStorage.getItem('atc_tema');if(t==='dark'||t==='light')document.documentElement.dataset.theme=t}catch(e){}</script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ATuCasa - Iniciar sesión</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <link rel="stylesheet" href="../static/css/variables.css">
-    <link rel="stylesheet" href="../static/css/style.css">
+    <link rel="stylesheet" href="../static/css/style.css?v=4">
 </head>
 <body class="bg-light">
     <div class="container mt-5" style="max-width: 420px;">
@@ -32,8 +33,8 @@
         </div>
     </div>
 
-    <script src="../static/js/api.js"></script>
-    <script src="../static/js/auth.js"></script>
+    <script src="../static/js/api.js?v=4"></script>
+    <script src="../static/js/auth.js?v=4"></script>
     <script>
         document.getElementById('btn-login').addEventListener('click', async () => {
             const email = document.getElementById('input-email').value;

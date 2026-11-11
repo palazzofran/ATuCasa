@@ -37,5 +37,6 @@ The project has no tests, linter or formatter configured. Alembic is in `require
 
 - `api.js` wraps `fetch`, adds the token from `localStorage.atc_token`, and redirects to login on a 401. `auth.js` stores `atc_token` and `atc_usuario`. `carrito.js` keeps the cart in `atc_carrito`.
 - Page paths are relative: `index.html` sits at the `app/` root and uses `./static/...` and `./views/...`; pages in `views/` use `../static/...` and `../index.html`. `getBase()` in `api.js` relies on this layout.
+- Theming: all colors are CSS variables at the top of `style.css` (`--brand` for button backgrounds, `--brand-text` for red text). Dark mode follows `prefers-color-scheme` by default; the navbar toggle in `navbar.js` sets `data-theme` on `<html>` and stores it in `localStorage.atc_tema`. Each page has an inline `<head>` script that applies the saved theme before first paint. Asset links carry a `?v=N` query for cache busting; bump it when CSS/JS changes.
 - `main.js`, `local.js` and `datos.js` (hard-coded mock stores) aren't referenced by any page. `index.html` and `local.html` have their own inline scripts instead.
 - `ATuCasa/` is its own git repo (remote `origin` on GitHub, branch `main`), nested inside the outer `Dev` repo. Run git commands from `ATuCasa/`.
