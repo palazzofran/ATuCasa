@@ -8,14 +8,14 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-  <link rel="stylesheet" href="../static/css/style.css?v=5">
+  <link rel="stylesheet" href="../static/css/style.css?v=6">
 </head>
 <body>
 
-<script src="../static/js/api.js?v=5"></script>
-<script src="../static/js/auth.js?v=5"></script>
-<script src="../static/js/carrito.js?v=5"></script>
-<script src="../static/js/navbar.js?v=5"></script>
+<script src="../static/js/api.js?v=6"></script>
+<script src="../static/js/auth.js?v=6"></script>
+<script src="../static/js/carrito.js?v=6"></script>
+<script src="../static/js/navbar.js?v=6"></script>
 
 <div class="wrap">
   <div id="info-local"><div class="spinner"></div></div>
@@ -96,6 +96,7 @@ async function cargarLocal() {
     Object.entries(grupos).forEach(([grupo, items]) => {
       contenedor.innerHTML += `<div class="menu-section-title">${grupo}</div>`;
       items.forEach(prod => {
+        _productos[prod.id] = prod;
         const qty = getCantidadProducto(prod.id);
         contenedor.innerHTML += `
           <div class="product-card" id="prod-${prod.id}">
@@ -132,6 +133,8 @@ async function cargarLocal() {
   }
 }
 
+const _productos = {};   // id -> producto del menú cargado
+
 function agregar(id, nombre, precio) {
   agregarAlCarrito(id, nombre, precio);
   _renderQty(id);
@@ -146,7 +149,8 @@ function _renderQty(id) {
   const el = document.getElementById(`qty-${id}`);
   if (!el) return;
   const qty = getCantidadProducto(id);
-  const prod = carrito.find(i => i.id === id) || {};
+  // Datos del menú (no del carrito: si la cantidad llegó a 0 el item ya no está ahí)
+  const prod = _productos[id] || carrito.find(i => i.id === id) || {};
   if (qty === 0) {
     el.innerHTML = `<button class="btn-order" onclick="agregar(${id},'${(prod.nombre||'').replace(/'/g,"\\'")}',${prod.precio||0})">
       <i class="fa-solid fa-plus"></i> Agregar</button>`;

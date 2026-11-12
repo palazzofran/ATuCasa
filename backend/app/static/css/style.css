@@ -374,6 +374,30 @@ button.card-fav { padding: 0; font: inherit; }
 .qty-btn:hover { background: var(--brand-glow); border-color: var(--brand-border); color: var(--brand-text); }
 .qty-num { font-size: 14px; font-weight: 600; min-width: 16px; text-align: center; }
 
+/* ── Resumen editable del checkout ── */
+.checkout-item {
+  display: flex; align-items: center; gap: 12px;
+  padding: 12px 0; border-bottom: 1px solid var(--border);
+}
+.checkout-item:last-child { border-bottom: 0; }
+.checkout-item-info { flex: 1; min-width: 0; }
+.checkout-item-nombre { font-weight: 600; color: var(--text-primary); overflow-wrap: anywhere; }
+.checkout-item-unit { font-size: 12px; color: var(--text-muted); }
+.checkout-item .qty-control { margin-top: 0; gap: 8px; }
+.checkout-item-subtotal { min-width: 72px; text-align: right; font-weight: 600; color: var(--text-primary); }
+.btn-quitar-item {
+  width: 32px; height: 32px; border-radius: 50%; flex-shrink: 0;
+  background: transparent; border: 1px solid transparent;
+  color: var(--text-muted); cursor: pointer; transition: all .15s;
+  display: flex; align-items: center; justify-content: center;
+}
+.btn-quitar-item:hover { color: var(--brand-text); background: var(--brand-glow); border-color: var(--brand-border); }
+@media (max-width: 420px) {
+  .checkout-item { flex-wrap: wrap; }
+  .checkout-item-info { flex-basis: 100%; }
+  .checkout-item-subtotal { margin-left: auto; }
+}
+
 /* ── CHECKOUT / FORMS ── */
 .page-center {
   min-height: calc(100vh - 60px); display: flex;

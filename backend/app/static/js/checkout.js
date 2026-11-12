@@ -9,25 +9,59 @@ document.addEventListener('DOMContentLoaded', () => {
     const usuarioDiv = document.getElementById('usuario-logueado');
     const nombreEl = document.getElementById('nombre-usuario');
 
-    // Mostrar resumen del carrito
-    const carrito = JSON.parse(localStorage.getItem('atc_carrito')) || [];
+    // Resumen del carrito, editable: −/+ cambia la cantidad y el tacho saca el producto.
+    // Usa el `carrito` global de carrito.js, así lo que se confirma es lo que se ve.
+    const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+    const plata = n => '$' + n.toLocaleString('es-AR');
 
-    if (carrito.length === 0) {
-        resumen.innerHTML = '<p class="text-muted">No hay productos en el carrito.</p>';
-        if (btnConfirmar) btnConfirmar.disabled = true;
-    } else {
-        let total = 0;
-        carrito.forEach(item => {
-            const subtotal = item.precio * item.cantidad;
-            total += subtotal;
-            resumen.innerHTML += `
-                <div class="d-flex justify-content-between mb-1">
-                    <span>${item.cantidad}x ${item.nombre}</span>
-                    <span>$${subtotal.toLocaleString('es-AR')}</span>
-                </div>`;
-        });
-        totalEl.innerText = total.toLocaleString('es-AR');
+    function renderResumen() {
+        if (carrito.length === 0) {
+            resumen.innerHTML = `<p class="text-muted mb-0">No hay productos en el carrito.
+                <a href="../index.html" class="form-link">Ver locales</a></p>`;
+            totalEl.innerText = '0';
+            if (btnConfirmar) btnConfirmar.disabled = true;
+            return;
+        }
+        resumen.innerHTML = carrito.map(item => `
+            <div class="checkout-item" data-id="${item.id}">
+                <div class="checkout-item-info">
+                    <div class="checkout-item-nombre">${esc(item.nombre)}</div>
+                    <div class="checkout-item-unit">${plata(item.precio)} c/u</div>
+                </div>
+                <div class="qty-control">
+                    <button type="button" class="qty-btn" data-accion="menos" aria-label="Quitar uno">−</button>
+                    <span class="qty-num">${item.cantidad}</span>
+                    <button type="button" class="qty-btn" data-accion="mas" aria-label="Agregar uno">+</button>
+                </div>
+                <div class="checkout-item-subtotal">${plata(item.precio * item.cantidad)}</div>
+                <button type="button" class="btn-quitar-item" data-accion="eliminar"
+                        aria-label="Sacar ${esc(item.nombre)} del pedido" title="Sacar del pedido">
+                    <i class="fa-regular fa-trash-can"></i>
+                </button>
+            </div>`).join('');
+        totalEl.innerText = getTotalCarrito().toLocaleString('es-AR');
+        if (btnConfirmar && btnConfirmar.textContent !== '¡Pedido enviado!') btnConfirmar.disabled = false;
     }
+
+    resumen.addEventListener('click', e => {
+        const btn = e.target.closest('[data-accion]');
+        if (!btn) return;
+        const id = Number(btn.closest('.checkout-item').dataset.id);
+        const item = carrito.find(i => i.id === id);
+        if (!item) return;
+        if (btn.dataset.accion === 'mas') {
+            item.cantidad += 1;
+            _guardarCarrito();
+        } else if (btn.dataset.accion === 'menos') {
+            quitarDelCarrito(id);
+        } else {
+            eliminarDelCarrito(id);
+            _mostrarToast(`${item.nombre} se sacó del pedido`);
+        }
+        renderResumen();
+    });
+
+    renderResumen();
 
     // Mostrar estado de sesión
     const usuario = getUsuarioActual();
