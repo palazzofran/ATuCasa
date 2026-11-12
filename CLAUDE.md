@@ -17,7 +17,7 @@ pip install -r requirements.txt
 uvicorn app.main:app --reload       # http://localhost:8000, Swagger at /docs
 ```
 
-Required `.env` keys: `DATABASE_URL`, `SECRET_KEY` (plus optional `ALGORITHM` and `ACCESS_TOKEN_EXPIRE_MINUTES`). The README refers to a `.env.example` that doesn't exist. For local development use `DATABASE_URL=sqlite:///./atucasa.db`. PostgreSQL is the intended production database.
+Required `.env` keys: `DATABASE_URL`, `SECRET_KEY` (plus optional `ALGORITHM` and `ACCESS_TOKEN_EXPIRE_MINUTES`). See `backend/.env.example`. For local development use `DATABASE_URL=sqlite:///./atucasa.db`. PostgreSQL is the intended production database.
 
 The project has no tests, linter or formatter configured. Alembic is in `requirements.txt` but isn't set up: there's no `alembic.ini` and no migrations.
 
@@ -32,6 +32,9 @@ The project has no tests, linter or formatter configured. Alembic is in `require
 - **Orders:** `POST /pedidos` computes the total on the server from current product prices and stores `precio_unitario` on each `ItemPedido`. Every product must belong to `local_id` and be `disponible`. Status flow: `pendiente → en_preparacion → enviado → entregado`. Customers may only set `cancelado`; the store owner may set any status. Transitions aren't enforced.
 - **Search:** `GET /locales?q=` filters in Python (not SQL) so it can ignore case and accents (`_normalizar` in `routers/locales.py`); every word must appear in the store's name/category/description or in one of its available products.
 - **Favorites:** `Favorito` table (unique per user+store); `GET /favoritos`, idempotent `PUT`/`DELETE /favoritos/{local_id}` returning 204. `api.js` handles empty 204 bodies.
+- **Order emails:** if a `Local` has `email`, `POST /pedidos` queues `services/correos_pedidos.notificar_nuevo_pedido` (BackgroundTasks, own DB session) which mails the store accept/reject links. Links carry a signed JWT (`tipo: respuesta_pedido`, expires after `RESPUESTA_PEDIDO_EXPIRE_HOURS`) and go to `routers/respuesta_pedido.py`: GET shows a confirmation page, POST applies it (accept → `enviado`, reject → `cancelado`, only from `pendiente`) and mails the client. `Local.email` is not in `LocalResponse` on purpose.
+- **Mail sending:** `core/email.py` uses SMTP from `.env` (`SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASSWORD`, `SMTP_FROM`, `APP_URL`); with no `SMTP_HOST` it writes each mail as an .html file to `backend/correos_salientes/` (gitignored). See `backend/.env.example`.
+- **Schema changes:** there are no migrations. `agregar_columnas_faltantes()` in `core/database.py` runs at startup and adds new nullable columns to existing tables; new non-nullable columns would still need a manual migration.
 - **Soft visibility:** public listings filter on `Local.activo` and `Producto.disponible`. Products are hard-deleted.
 - **CORS:** all origins are allowed.
 

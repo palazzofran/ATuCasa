@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from typing import List
 from ..core.database import get_db
@@ -7,6 +7,7 @@ from ..models.pedido import Pedido, ItemPedido
 from ..models.local import Producto, Local
 from ..models.usuario import Usuario
 from ..schemas.pedido import PedidoCreate, PedidoResponse, PedidoEstadoUpdate
+from ..services.correos_pedidos import notificar_nuevo_pedido
 
 router = APIRouter(prefix="/pedidos", tags=["Pedidos"])
 
@@ -16,6 +17,7 @@ ESTADOS_VALIDOS = ["pendiente", "en_preparacion", "enviado", "entregado", "cance
 @router.post("/", response_model=PedidoResponse, status_code=status.HTTP_201_CREATED)
 def crear_pedido(
     data: PedidoCreate,
+    background: BackgroundTasks,
     db: Session = Depends(get_db),
     current_user: Usuario = Depends(get_current_user),
 ):
@@ -62,6 +64,10 @@ def crear_pedido(
 
     db.commit()
     db.refresh(pedido)
+
+    # Si el local tiene mail, le llega el pedido para aceptarlo o rechazarlo
+    if local.email:
+        background.add_task(notificar_nuevo_pedido, pedido.id)
     return pedido
 
 

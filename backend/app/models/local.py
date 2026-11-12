@@ -11,6 +11,7 @@ class Local(Base):
     categoria = Column(String, nullable=True)       # "comida", "farmacia", "supermercado", etc.
     imagen_url = Column(String, nullable=True)
     direccion = Column(String, nullable=True)
+    email = Column(String, nullable=True)           # adonde llegan los pedidos para aceptar/rechazar
     activo = Column(Boolean, default=True)
     propietario_id = Column(Integer, ForeignKey("usuarios.id"), nullable=False)
 

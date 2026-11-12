@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, EmailStr
 from typing import Optional, List
 
 # --- Producto ---
@@ -35,6 +35,7 @@ class LocalCreate(BaseModel):
     categoria: Optional[str] = None
     imagen_url: Optional[str] = None
     direccion: Optional[str] = None
+    email: Optional[EmailStr] = None   # recibe los pedidos para aceptar/rechazar (no se muestra en público)
 
 class LocalUpdate(BaseModel):
     nombre: Optional[str] = None
@@ -42,6 +43,7 @@ class LocalUpdate(BaseModel):
     categoria: Optional[str] = None
     imagen_url: Optional[str] = None
     direccion: Optional[str] = None
+    email: Optional[EmailStr] = None
     activo: Optional[bool] = None
 
 class LocalResponse(BaseModel):
